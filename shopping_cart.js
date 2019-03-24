@@ -6,7 +6,7 @@ ShoppingCart.new = function(pricingRules) {
   this.pricingRules = pricingRules
   this.items = []
   this.items_2 = []
-  this.total = 0.00
+  this.total = "$0"
 
   return ShoppingCart
 }
@@ -39,7 +39,7 @@ ShoppingCart.add = function(item, promo_code) {
       this.items_2.push(newItem)      
     }
 
-    this.total = this.pricingRules.computePrice(product, promo_code, this.items_2)
+    this.total = "$" + this.pricingRules.computePrice(product, promo_code, this.items_2)
     this.items = this.pricingRules.updateCartItems(this.items_2, this.pricingRules)
   } 
   else {
@@ -60,6 +60,13 @@ PricingRules.new = function() {
 
 /* add product in the product list */
 PricingRules.add = function(product_code, product_name, product_price) {
+
+  /* check if exist in the product list */ 
+  var product = PricingRules.getProduct(product_code)
+  if (product) {
+    console.log("product [" + product_code + "] already exist in the product list")
+    return
+  }
 
   var product = {
     product_code: product_code,
@@ -111,8 +118,8 @@ PricingRules.computePrice = function(product, promo_code, items) {
         total += parseFloat((product_count * product_price ).toFixed(10))
         break
 
-      default:
-        /* do nothing */
+      default: /* others */
+        total += parseFloat((product_count * product_price ).toFixed(10))
     }
   }
 
@@ -168,26 +175,26 @@ PricingRules.updateCartItems = function (items, pricingRules) {
     product_name = items[i].product_name
 
     switch (items[i].product_code) {
-      case "ult_small":
+      case "ult_small":  /* Unlimited 1GB */
         cart_items.push(product_count + x_tag + product_name)
         break
 
-      case "ult_medium":
+      case "ult_medium":  /* Unlimited 2GB */
         cart_items.push(product_count + x_tag + product_name)
         var product = pricingRules.getProduct("1gb")
         cart_items.push(product_count + x_tag + product.product_name)
         break
       
-      case "ult_large":
+      case "ult_large":  /* Unlimited 5GB */
         cart_items.push(product_count + x_tag + product_name)
         break
 
-      case "1gb":
+      case "1gb":  /* 1 GB Data-pack */
         cart_items.push(product_count + x_tag + product_name)
         break
 
-      default:
-        /* do nothing */
+      default: /* others*/
+        cart_items.push(product_count + x_tag + product_name)
     }
   }
 
